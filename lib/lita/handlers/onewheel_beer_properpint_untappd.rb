@@ -52,7 +52,7 @@ module Lita
         beers.each do |tap, datum|
           reply += "#{tap}) "
           reply += get_tap_type_text(datum[:type])
-          reply += datum[:brewery].to_s + ' '
+          reply += datum[:brewery].to_s + ': '
           reply += (datum[:name].to_s.empty?)? '' : datum[:name].to_s + '  '
         end
         reply = reply.strip.sub /,\s*$/, ''
@@ -62,8 +62,8 @@ module Lita
       end
 
       def send_response(tap, datum, response)
-        reply = "Level3 tap #{tap}) #{get_tap_type_text(datum[:type])}"
-        reply += "#{datum[:brewery]} "
+        reply = "Proper Pint tap #{tap}) #{get_tap_type_text(datum[:type])}"
+        reply += "#{datum[:brewery]}: "
         reply += "#{datum[:name]} "
         reply += "- #{datum[:desc].sub /\.$/, ''}, "
         reply += "#{datum[:abv]}% ABV."
@@ -105,13 +105,17 @@ module Lita
         gimme_what_you_got = {}
         noko = Nokogiri.HTML response
         noko.css('div.beer-details').each do |beer_node|
+          # beer_node = beer_node.css('div#section_217106141')
           name_n_tap = beer_node.css('h5 a').first.children.to_s
           short_desc = beer_node.css('h5 em').first.children.to_s
           brewery = beer_node.css('h6 a').first.children.to_s
           abv_node = beer_node.css('h6 span').first.children.to_s
 
+          Lita.logger.info("NnT: #{name_n_tap}")
+
           tap = name_n_tap[/^\d+/]
-          beer_name = name_n_tap[/[\w\s]+$/].strip
+          next if tap.nil?
+          beer_name = name_n_tap[/[^\..]+$/].strip
           abv = abv_node[/^\d+\.\d+/]
           beer_desc = short_desc
 
