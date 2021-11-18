@@ -5,27 +5,27 @@ require 'json'
 module Lita
   module Handlers
     class OnewheelBeerProperpintUntappd < OnewheelBeerBase
-      route /^pp$/i,
+      route /^ppo*$/i,
             :taps_list,
             command: true,
             help: {'pp' => 'Display the current taps.'}
 
-      route /^pp ([\w ]+)$/i,
+      route /^ppo* ([\w ]+)$/i,
             :taps_deets,
             command: true,
             help: {'pp 4' => 'Display the tap 4 deets, including prices.'}
 
-      route /^pp ([<>=\w.\s]+)%$/i,
+      route /^ppo* ([<>=\w.\s]+)%$/i,
             :taps_by_abv,
             command: true,
             help: {'pp >4%' => 'Display beers over 4% ABV.'}
 
-      route /^pp ([<>=\$\w.\s]+)$/i,
+      route /^ppo* ([<>=\$\w.\s]+)$/i,
             :taps_by_price,
             command: true,
             help: {'pp <$5' => 'Display beers under $5.'}
 
-      route /^pp (roulette|random)$/i,
+      route /^ppo* (roulette|random)$/i,
             :taps_by_random,
             command: true,
             help: {'pp roulette' => 'Can\'t decide?  Let me do it for you!'}
@@ -35,19 +35,19 @@ module Lita
       #       command: true,
       #       help: {'pplow' => 'Show me the kegs at <10% remaining, or the lowest one available.'}
 
-      route /^ppabvlow$/i,
+      route /^ppo*abvlow$/i,
             :taps_low_abv,
             command: true,
             help: {'ppabvlow' => 'Show me the lowest abv keg.'}
 
-      route /^ppabvhigh$/i,
+      route /^ppo*abvhigh$/i,
             :taps_high_abv,
             command: true,
             help: {'ppabvhigh' => 'Show me the highest abv keg.'}
 
       def taps_list(response)
         # wakka wakka
-        beers = self.get_source
+        beers = self.get_source response
         reply = "Proper Pint taps: "
         beers.each do |tap, datum|
           reply += "#{tap}) "
@@ -84,11 +84,17 @@ module Lita
         price_array.join ' | '
       end
 
-      def get_source
+      def get_source(response)
         # Lita.logger.debug "get_source started"
         # unless (response = redis.get('page_response'))
         #   Lita.logger.info 'No cached result found, fetching.'
         uri = 'https://untappd.com/v/proper-pint-taproom/6478413'
+        # quick 'n dirty oakroom hack
+        Lita.logger.info response.matches
+        if response.matches[0] == 'ppo'
+          uri = 'https://untappd.com/v/proper-pint-oakroom/10632112'
+        end
+
         Lita.logger.info "Getting #{uri}"
         response = RestClient.get(uri)
           # redis.setex('page_response', 1800, response)
@@ -111,7 +117,7 @@ module Lita
           brewery = beer_node.css('h6 a').first.children.to_s
           abv_node = beer_node.css('h6 span').first.children.to_s
 
-          Lita.logger.info("NnT: #{name_n_tap}")
+          # Lita.logger.info("NnT: #{name_n_tap}")
 
           tap = name_n_tap[/^\d+/]
           next if tap.nil?
