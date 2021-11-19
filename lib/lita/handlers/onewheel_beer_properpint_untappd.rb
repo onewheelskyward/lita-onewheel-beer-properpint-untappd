@@ -48,7 +48,12 @@ module Lita
       def taps_list(response)
         # wakka wakka
         beers = self.get_source response
-        reply = "Proper Pint taps: "
+        oakroom = ''
+        if response.matches[0] == 'ppo'
+          oakroom = 'Oakroom '
+        end
+
+        reply = "Proper Pint #{oakroom}taps: "
         beers.each do |tap, datum|
           reply += "#{tap}) "
           reply += get_tap_type_text(datum[:type])
