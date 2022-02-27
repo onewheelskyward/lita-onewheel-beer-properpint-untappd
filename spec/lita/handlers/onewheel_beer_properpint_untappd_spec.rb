@@ -1,14 +1,19 @@
 require 'spec_helper'
 
 describe Lita::Handlers::OnewheelBeerProperpintUntappd, lita_handler: true do
-  before do
+  it 'shows the taps' do
     mock = File.open('spec/fixtures/pp.html').read
     allow(RestClient).to receive(:get) { mock }
+    send_command 'pp'
+    expect(replies.last).to eq("Proper Pint taps: 1) Ex Novo Brewing: Record Skip  2) Unicorn Brewing: Czech Pilsner  3) pFriem Family Brewers: Let's Bourbon Barrel Imperial Stout  4) Little Beast Brewing: Bes  5) Fieldwork® Brewing Company: Moahu  6) Rosenstadt Brewery: German-Hop Pale Ale  7) Matchless Brewing: ZZ Topaz  8) Bent Shovel Brewing: Black Spade Stout  9) Oregon City Brewing Company: Fallstreak")
   end
 
-  it 'shows the taps' do
+  it 'shows the taps with a mai tai p.a.' do
+    mock = File.open('spec/fixtures/pp-20220222.html').read
+    allow(RestClient).to receive(:get) { mock }
+
     send_command 'pp'
-    expect(replies.last).to eq("Proper Pint taps: 1) Ex Novo Brewing: Record Skip  2) Unicorn Brewing: Czech Pilsner  3) pFriem Family Brewers: Let's Bourbon Barrel Imperial Stout  4) Little Beast Brewing: Bes  5) Fieldwork® Brewing Company: Moahu  6) Rosenstadt Brewery: German-Hop Pale Ale  7) Matchless Brewing: ZZ Topaz  8) Bent Shovel Brewing: Black Spade Stout  9) Oregon City Brewing Company: Fallstreak  10) 54°40' Brewing Company: River Road  11) North Jetty Brewing: Flor De Yavari Sour Ale  12) North Jetty Brewing: Leadbetter Red Scottish Ale  13) Urban Family Brewing: Divine Scepter  14) Ninkasi Brewing Company: Sleigh'r  15) Gigantic Brewing Company: Mecha Red  17) 19 Acres Hard Cider: Honeycrisp  18) Ruzzo - Hard Citrus: Paradise Kick  19) Locust Cider: Dark Cherry  20) Longdrop Cider Company: Blueberry Pie")
+    expect(replies.last).to eq("Proper Pint taps: 1) Silver City Brewery: Ride the Spiral  2) Alvarado Street Brewery: Mai Tai P.A.  3) Matchless Brewing: Hoponista  4) Perennial Artisan Ales: Abraxas  5) SteepleJack Brewing Co.: Alewife  6) Dogfish Head Craft Brewery: Fruit-Full Fort  7) Little Beast Brewing: Helles Lager  8) Mikkeller: Beer Geek Vanilla Shake  9) StormBreaker Brewing: Blondie Wine")
   end
 
   # it 'displays details for tap 4' do

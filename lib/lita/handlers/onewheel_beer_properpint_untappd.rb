@@ -123,10 +123,11 @@ module Lita
           abv_node = beer_node.css('h6 span').first.children.to_s
 
           # Lita.logger.info("NnT: #{name_n_tap}")
-
-          tap = name_n_tap[/^\d+/]
+          /^(?<tap>\d)\.\s*(?<beer_name>.*)/ =~ name_n_tap
+          # tap = name_n_tap[/^\d+/]
           next if tap.nil?
-          beer_name = name_n_tap[/[^\..]+$/].strip
+          # print "name_n_tap #{name_n_tap}"
+          # beer_name = name_n_tap[/[^\..]+$/].strip
           abv = abv_node[/^\d+\.\d+/]
           beer_desc = short_desc
 
