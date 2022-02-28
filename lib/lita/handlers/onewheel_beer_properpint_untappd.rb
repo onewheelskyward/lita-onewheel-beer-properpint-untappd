@@ -1,10 +1,10 @@
 require 'rest-client'
-require 'lita-onewheel-beer-base'
+require 'lita-onewheel-beer-untappd-lib'
 require 'json'
 
 module Lita
   module Handlers
-    class OnewheelBeerProperpintUntappd < OnewheelBeerBase
+    class OnewheelBeerProperpintUntappd < OnewheelBeerUntappdLib
       route /^ppo*$/i,
             :taps_list,
             command: true,
@@ -47,7 +47,7 @@ module Lita
 
       def taps_list(response)
         # wakka wakka
-        beers = self.get_source response
+        beers = self.get_source
         oakroom = ''
         if response.matches[0] == 'ppo'
           oakroom = 'Oakroom '
@@ -89,64 +89,22 @@ module Lita
         price_array.join ' | '
       end
 
-      def get_source(response)
+      def get_source
         # Lita.logger.debug "get_source started"
         # unless (response = redis.get('page_response'))
         #   Lita.logger.info 'No cached result found, fetching.'
         uri = 'https://untappd.com/v/proper-pint-taproom/6478413'
         # quick 'n dirty oakroom hack
-        Lita.logger.info response.matches
-        if response.matches[0] == 'ppo'
-          uri = 'https://untappd.com/v/proper-pint-oakroom/10632112'
-        end
+        # Lita.logger.info response.matches
+        # if response.matches[0] == 'ppo'
+        #   uri = 'https://untappd.com/v/proper-pint-oakroom/10632112'
+        # end
 
         Lita.logger.info "Getting #{uri}"
         response = RestClient.get(uri)
           # redis.setex('page_response', 1800, response)
         # end
         parse_response response
-      end
-
-      # This is the worker bee- decoding the html into our "standard" document.
-      # Future implementations could simply override this implementation-specific
-      # code to help this grow more widely.
-      def parse_response(response)
-        Lita.logger.debug "parse_response started."
-
-        gimme_what_you_got = {}
-        noko = Nokogiri.HTML response
-        noko.css('div.beer-details').each do |beer_node|
-          # beer_node = beer_node.css('div#section_217106141')
-          name_n_tap = beer_node.css('h5 a').first.children.to_s
-          short_desc = beer_node.css('h5 em').first.children.to_s
-          brewery = beer_node.css('h6 a').first.children.to_s
-          abv_node = beer_node.css('h6 span').first.children.to_s
-
-          # Lita.logger.info("NnT: #{name_n_tap}")
-          /^(?<tap>\d)\.\s*(?<beer_name>.*)/ =~ name_n_tap
-          # tap = name_n_tap[/^\d+/]
-          next if tap.nil?
-          # print "name_n_tap #{name_n_tap}"
-          # beer_name = name_n_tap[/[^\..]+$/].strip
-          abv = abv_node[/^\d+\.\d+/]
-          beer_desc = short_desc
-
-          # full_text_search = "#{tap.sub /\d+/, ''} #{brewery} #{beer_name} #{beer_desc.to_s.gsub /\d+\.*\d*%*/, ''}"
-          # prices = get_prices(beer_node)
-
-          gimme_what_you_got[tap] = {
-              # type: tap_type,
-              # remaining: remaining,
-              brewery: brewery.to_s,
-              name: beer_name.to_s,
-              desc: beer_desc.to_s,
-              abv: abv.to_f
-              # prices: prices,
-              # price: prices[1][:cost],
-              # search: full_text_search
-          }
-        end
-        gimme_what_you_got
       end
 
       Lita.register_handler(self)

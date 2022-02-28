@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'lita', '~> 4'
   spec.add_runtime_dependency 'rest-client', '~> 2'
-  spec.add_runtime_dependency 'lita-onewheel-beer-base', '~> 2'
+  spec.add_runtime_dependency 'lita-onewheel-beer-untappd-lib', '~> 0'
   spec.add_runtime_dependency 'json', '~> 2'
 
   spec.add_development_dependency 'bundler', '~> 2'

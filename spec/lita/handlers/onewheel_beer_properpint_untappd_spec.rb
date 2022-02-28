@@ -16,6 +16,14 @@ describe Lita::Handlers::OnewheelBeerProperpintUntappd, lita_handler: true do
     expect(replies.last).to eq("Proper Pint taps: 1) Silver City Brewery: Ride the Spiral  2) Alvarado Street Brewery: Mai Tai P.A.  3) Matchless Brewing: Hoponista  4) Perennial Artisan Ales: Abraxas  5) SteepleJack Brewing Co.: Alewife  6) Dogfish Head Craft Brewery: Fruit-Full Fort  7) Little Beast Brewing: Helles Lager  8) Mikkeller: Beer Geek Vanilla Shake  9) StormBreaker Brewing: Blondie Wine")
   end
 
+  it 'shows the tap details for 2' do
+    mock = File.open('spec/fixtures/pp-20220222.html').read
+    allow(RestClient).to receive(:get) { mock }
+
+    send_command 'pp 2'
+    expect(replies.last).to eq("Proper Pint taps: 1) Silver City Brewery: Ride the Spiral  2) Alvarado Street Brewery: Mai Tai P.A.  3) Matchless Brewing: Hoponista  4) Perennial Artisan Ales: Abraxas  5) SteepleJack Brewing Co.: Alewife  6) Dogfish Head Craft Brewery: Fruit-Full Fort  7) Little Beast Brewing: Helles Lager  8) Mikkeller: Beer Geek Vanilla Shake  9) StormBreaker Brewing: Blondie Wine")
+  end
+
   # it 'displays details for tap 4' do
   #   send_command 'pp 4'
   #   expect(replies.last).to eq('Bailey\'s tap 4) Wild Ride Solidarity - Abbey Dubbel – Barrel Aged (Pinot Noir) 8.2%, 4oz - $4 | 12oz - $7, 26% remaining')
